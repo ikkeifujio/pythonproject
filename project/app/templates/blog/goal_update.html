@@ -1,0 +1,13 @@
+{% extends "blog/base.html" %}
+{% block content %}
+<body>
+    <h1>目標変更</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type="submit" value="保存">
+    </form>
+    <hr>
+    <a href="{% url 'goal_form'%}">戻る</a>
+</body>
+{% endblock %}

@@ -1,0 +1,20 @@
+<h1>{{ month_current.month }}月の目標</h1>
+{% for month in year_month %}
+    <a href="{% url 'goal' month.year month.month month.day %}">{{month.month}}</a>
+{% endfor %}
+    {% for week_day_schedles in month_day_schedules %}
+        <tr>
+            {% for day, schedules in week_day_schedles.items %}
+                {% for schedule in schedules %}
+                    {% if schedule ==  schedule %}
+                        <p>{{ schedule.year }}</p>
+                        <p>{{ schedule.month }}</p>
+                    {% else %}
+                        <p>まだ目標が決まってません！</p>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            </td>
+            {% endfor %}
+        </tr>
+    {% endfor %}

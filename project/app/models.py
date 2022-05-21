@@ -29,6 +29,7 @@ class Comment(models.Model):
     email = models.EmailField()
     body = models.TextField()
     posted_date = models.DateTimeField(auto_now_add=True)
+    
 #調べる
 class Account(models.Model):
     
@@ -54,4 +55,7 @@ class Schedule(models.Model):
     def __str__(self):
         return self.summary
 
-
+class Goal(models.Model):
+    year = models.CharField("今年の目標",max_length=100)
+    month = models.CharField("今月の目標",max_length=100)
+    date = models.DateField("日付")

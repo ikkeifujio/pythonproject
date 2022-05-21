@@ -8,9 +8,9 @@ from django.shortcuts import render, redirect
 from django.views.generic import TemplateView
 from sympy import Id
 from app.forms import ComentForm, PostForm, SimpleScheduleForm
-from .models import Post
+from .models import Goal, Post
 #ユーザーアカウントフォーム
-from .forms import AccountForm, AddAccountForm
+from .forms import AccountForm, AddAccountForm, GoalForm
 
 #ログイン、ログアウト時に必要
 from django.contrib.auth import authenticate, login, logout
@@ -66,7 +66,7 @@ def home(request):
     params = {"UserID":request.user,}
     return render(request, "blog/home.html",context=params)
 
-def frontpage(request):
+def bulletinboard(request):
     posts = Post.objects.all()
     user = request.user
     if request.method == "POST":
@@ -84,7 +84,7 @@ def frontpage(request):
 
     return render(request, "blog/bulletinboard.html", {"posts": posts, "post_forms": post_forms, "user":user})
 
-class frontpages(mixins.WeekWithScheduleMixin, generic.CreateView):
+class frontpages(mixins.WeekWithScheduleMixin,generic.CreateView):
     template_name = 'blog/frontpage.html'
     model = Schedule
     date_field = 'date'
@@ -96,15 +96,11 @@ class frontpages(mixins.WeekWithScheduleMixin, generic.CreateView):
         context.update(week_calendar_context)
         posts = Post.objects.all()
         context["posts"] = posts
-        post_forms = PostForm(self.request.GET or None)
-        context.update({"post_forms":post_forms})
+        goal_all = Goal.objects.all()
+        context["goal_all"] = goal_all
         return context
 
     def form_valid(self, form):
-        post_forms = PostForm(self.request.POST)
-        if post_forms.is_valid():
-            posts2 = post_forms.save(commit=False)
-            posts2.save()
         month = self.kwargs.get('month')
         year = self.kwargs.get('year')
         day = self.kwargs.get('day')
@@ -123,19 +119,14 @@ def post_detail(request, slug):
     post = Post.objects.get(slug=slug)
     if request.method == "POST":
         form = ComentForm(request.POST)
-        print(form)
         if form.is_valid():
             comment = form.save(commit=False)
             comment.post = post
             comment.save()
-
             return redirect("post_detail", slug=post.slug)
-    
     else:
         form = ComentForm()
-
     return render(request, "blog/post_detail.html", {"post": post, "form": form})
-
 
 #アカウント作成(調べる)
 class  AccountRegistration(TemplateView):
@@ -254,14 +245,92 @@ class MonthWithFormsCalendar(mixins.MonthWithFormsMixin, generic.View):
 
 
 
-class MonthWithScheduleCalendar(mixins.MonthWithScheduleMixin, generic.TemplateView):
+class MonthWithScheduleCalendar(mixins.MonthWithScheduleMixin, generic.CreateView):
     """スケジュール付きの月間カレンダーを表示するビュー"""
     template_name = 'blog/month_with_schedule.html'
     model = Schedule
     date_field = 'date'
+    form_class = BS4ScheduleForm
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         calendar_context = self.get_month_calendar()
         context.update(calendar_context)
+        print(context)
         return context
+    
+    def form_valid(self, form):
+        month = self.kwargs.get('month')
+        year = self.kwargs.get('year')
+        day = self.kwargs.get('day')
+        if month and year and day:
+            date = datetime.date(year=int(year), month=int(month), day=int(day))
+        else:
+            date = datetime.date.today()
+        schedule = form.save(commit=False)
+        schedule.date = date
+        schedule.save()
+        return redirect('month_with_schedule', year=date.year, month=date.month, day=date.day)
+
+
+class GoalData(mixins.MonthWithScheduleMixin, generic.CreateView):
+    template_name = "blog/goal_form.html"
+    model = Goal
+    date_field = "date"
+    form_class = GoalForm
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        goal_context = self.get_month_calendar()
+        day_schedules = {}
+        for week_day_schedules in goal_context["month_day_schedules"]:
+            for days, schedules in week_day_schedules.items():
+                if schedules == []:
+                    continue
+                day_schedules[days] = schedules
+        context["day_schedules"] = day_schedules    
+        context["month_current"] = goal_context["month_current"]
+        month = self.kwargs.get('month')
+        year = self.kwargs.get('year')
+        day = self.kwargs.get('day')
+        if month and year and day:
+            date = datetime.date(year=int(year), month=int(month), day=int(day))
+        else:
+            date = datetime.date.today()
+        year_month = self.get_year_month(date)
+        context["year_month"] = year_month
+        goal_all = Goal.objects.all()
+        context["goal_all"] = goal_all
+        goal_form = GoalForm()
+        context["date"] = date
+        context["goal_form"] = goal_form
+        print(context)
+
+        return context
+
+    def form_valid(self, form):
+        month = self.kwargs.get('month')
+        year = self.kwargs.get('year')
+        day = self.kwargs.get('day')
+        if month and year and day:
+            date = datetime.date(year=int(year), month=int(month), day=int(day))
+        else:
+            date = datetime.date.today()
+        goal_form = form.save(commit=False)
+        goal_form.date = date
+        goal_form.save()
+        return redirect('goal_form', year=date.year, month=date.month, day=date.day)
+
+
+class GoalDataUpdate(generic.UpdateView):
+    template_name = "blog/goal_update.html"
+    model = Goal
+    fields = ('year', 'month')
+
+    def get_success_url(self):
+        return reverse('goal_form')
+
+    def form_valid(self, form):
+        goal_form = form.save(commit=False)
+        goal_form.save()
+        return super().form_valid(form)

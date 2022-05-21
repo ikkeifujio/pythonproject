@@ -45,6 +45,8 @@
     <hr />
 </div>
 {% endfor %}
-<a href="{% url 'bulletinboard'%}">掲示板投稿はこちら！</a>
+<a href="{% url  'bulletinboard' %}">掲示板の投稿はこちら！</a>
+<hr>
+    {% include  'blog/goal.html' %}
 </body>
 {% endblock %}

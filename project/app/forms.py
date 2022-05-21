@@ -1,18 +1,18 @@
+from attr import field
 from django import forms
-from .models import Comment, Post, Account
+from .models import Comment, Post, Account, Schedule, Goal
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from .models import Schedule
 
 class ComentForm(forms.ModelForm):
     class Meta:
         model = Comment
-        fields = ["name", "email", "body"]
+        fields = ["name", "email", "body",]
 
 class PostForm(forms.ModelForm):
     class Meta:
         model = Post
-        fields = ["title","intro", "body"]
+        fields = ["title","intro", "body",]
 
 # フォームクラス作成
 class AccountForm(forms.ModelForm):
@@ -92,3 +92,8 @@ class SimpleScheduleForm(forms.ModelForm):
                 '終了時間は、開始時間よりも後にしてください'
             )
         return end_time
+
+class GoalForm(forms.ModelForm):
+    class Meta:
+        model = Goal
+        fields = ["year", "month"]

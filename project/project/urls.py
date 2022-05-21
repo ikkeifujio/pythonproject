@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.urls import path, include
-from app.views import frontpage, frontpages
+from app.views import frontpages
 
 urlpatterns = [
     path('blog/', include('app.urls'), name="blog"),

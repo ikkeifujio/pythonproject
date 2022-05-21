@@ -1,0 +1,25 @@
+{% extends "blog/base.html" %}
+{% block content %}
+{% for month in year_month %}
+    <a href="{% url 'goal_form' month.year month.month month.day %}">{{month.month}}</a>
+{% endfor %}
+<h1>今年の目標</h1>
+    {% for day, schedules in day_schedules.items %}
+        {% for s in schedules %}
+        <p>{{s.year}}</p>
+        {% endfor %}
+    {% endfor %}
+<h1>{{ month_current.month }}月の目標</h1>
+    {% for day, schedules in day_schedules.items %}
+        {% for s in schedules %}
+        <p>{{s.month}}</p>
+        <a href="{% url 'goal_update' s.pk %}">編集</a> <!-- 追加 -->
+        {% endfor %}
+    {% endfor %}
+<form action="" method="POST">
+    <p>今年の目標：{{goal_form.year}}</p>
+    <p>今月の目標：{{goal_form.month}}</p>
+    <button type="submit" class="btn btn-primary">送信</button>
+    {% csrf_token %}
+</form>
+{% endblock %}

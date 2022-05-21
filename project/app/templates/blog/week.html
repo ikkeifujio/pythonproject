@@ -13,9 +13,9 @@
             <td>
                 <!-- 日付 -->
                 {% if week_first.month != day.month %}
-                    {{ day | date:"m/d" }}
+                    <a href="{% url 'frontpage' day.year day.month day.day %}">{{ day | date:"m/d" }}</a>
                 {% else %}
-                    {{ day.day }}
+                    <a href="{% url 'frontpage' day.year day.month day.day %}">{{day.day}}</a>
                 {% endif %}
                 <br>
 

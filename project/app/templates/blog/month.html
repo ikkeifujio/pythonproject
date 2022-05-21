@@ -18,9 +18,9 @@
 
             <div>
                 {% if month_current.month != day.month %}
-                    {{ day | date:"m/d" }}
+                    <a href="{% url 'month' day.year day.month day.day %}">{{ day | date:"m/d" }}</a>
                 {% else %}
-                    {{ day.day }}
+                    <a href="{% url 'month' day.year day.month day.day %}">{{day.day}}</a>
                 {% endif %}
 
                 {% for schedule in schedules %}
