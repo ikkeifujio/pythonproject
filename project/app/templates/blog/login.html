@@ -1,0 +1,26 @@
+{% extends "blog/base.html" %}
+{% block content %}
+<body>
+<h1>ログイン画面</h1>
+
+<div class="reg">
+  <form method="post" action="{% url 'login' %}">
+    {% csrf_token %}
+
+    <table class="reg_form">
+    <tr>
+    <td><label for="userid">ユーザーID:</label></td>
+    <td><input type="text" name="userid"></td>
+    <td><label for="password">パスワード：</label></td>
+    <td><input type="password" name="password"></td>
+    </tr>
+    </table>
+
+    <input type="submit" class="btn" value="Login">
+ </form>
+</div>
+   <p class="message">アカウントをお持ちですか？：
+   <a href="{% url 'register' %}">アカウントを作成</a>
+   </p>
+</body>
+{% endblock %}

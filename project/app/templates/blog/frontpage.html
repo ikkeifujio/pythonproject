@@ -1,0 +1,50 @@
+{% extends "blog/base.html" %}
+{% block content %}
+<body>
+    {% if user.is_authenticated %}
+    <p>{{ user.get_username }}でログイン中</p>
+    {% else %}
+    <p>ログインしていません</p>
+    {% endif %}
+<div class="post block">
+    <div class="col-md-9">
+        {% include 'blog/week.html' %}
+    </div>
+    <div>
+    <a href="{% url 'frontpage' day_previous.year day_previous.month day_previous.day %}">前の日</a>
+    <p>{{ day_current | date:"Y年m月d日" }}の予定を書く</p>
+    <a href="{% url 'frontpage' day_next.year day_next.month day_next.day %}">次の日</a>
+    </div>
+    <form action="" method="POST">
+        {{ form.non_field_errors }}
+        {% for field in form %}
+            <div class="form-group row">
+                <label for="{{ field.id_for_label }}"
+                       class="col-sm-4 col-form-label">{{ field.label_tag }}</label>
+                <div class="col-sm-8">
+                    {{ field }}
+                    {{ field.errors }}
+                </div>
+            </div>
+        {% endfor %}
+        {% csrf_token %}
+        <button type="submit" class="btn btn-primary">送信</button>
+    </form>
+    </div>
+</div>
+<hr>
+<h1>掲示板</h1>
+<hr>
+{% for post in posts %}
+<div class="post block">
+    <h2 class="subtitle">{{post.title}}</h2>
+    <small>投稿された時間：{{post.posted_date}}</small>
+    <p>{{post.user}}</p>
+    <p>{{post.intro}}</p>
+    <a href="{% url 'post_detail' post.slug %}">もっと読む</a>
+    <hr />
+</div>
+{% endfor %}
+<a href="{% url 'bulletinboard'%}">掲示板投稿はこちら！</a>
+</body>
+{% endblock %}

@@ -1,0 +1,6 @@
+{% extends "blog/base.html" %}
+{% block content %}
+{% for post in calendar_post %}
+<p>{{post}}</p>
+{% endfor %}
+{% endblock %}

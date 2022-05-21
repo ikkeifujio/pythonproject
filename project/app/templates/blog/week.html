@@ -1,0 +1,32 @@
+
+ <table class="table table-bordered">
+    <thead>
+    <tr>
+        {% for w in week_names %}
+            <th>{{ w }}</th>
+        {% endfor %}
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        {% for day, schedules in week_day_schedules.items %}
+            <td>
+                <!-- 日付 -->
+                {% if week_first.month != day.month %}
+                    {{ day | date:"m/d" }}
+                {% else %}
+                    {{ day.day }}
+                {% endif %}
+                <br>
+
+                <!-- その日のスケジュール -->
+                {% for s in schedules %}
+                    {{ s.start_time }} - {{ s.end_time }}<br>
+                    {{ s.summary }}<br>
+                    {{ s.description | linebreaks }}
+                {% endfor %}
+            </td>
+        {% endfor %}
+    </tr>
+    </tbody>
+</table>
