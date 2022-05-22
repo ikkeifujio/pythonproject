@@ -98,6 +98,12 @@ class frontpages(mixins.WeekWithScheduleMixin,generic.CreateView):
         context["posts"] = posts
         goal_all = Goal.objects.all()
         context["goal_all"] = goal_all
+        year_month = []
+        date = datetime.date.today()
+        date = date.replace(year=date.year, month=date.month, day=1)
+        year_month.append(date)
+        context["year_month"] = year_month
+        print(context)
         return context
 
     def form_valid(self, form):
@@ -282,13 +288,6 @@ class GoalData(mixins.MonthWithScheduleMixin, generic.CreateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         goal_context = self.get_month_calendar()
-        day_schedules = {}
-        for week_day_schedules in goal_context["month_day_schedules"]:
-            for days, schedules in week_day_schedules.items():
-                if schedules == []:
-                    continue
-                day_schedules[days] = schedules
-        context["day_schedules"] = day_schedules    
         context["month_current"] = goal_context["month_current"]
         month = self.kwargs.get('month')
         year = self.kwargs.get('year')
@@ -298,6 +297,10 @@ class GoalData(mixins.MonthWithScheduleMixin, generic.CreateView):
         else:
             date = datetime.date.today()
         year_month = self.get_year_month(date)
+        year_month_first = year_month[1]
+        year_month_last = year_month[-1]
+        month_goals = self.get_month_goals(year_month_first,year_month_last,date)
+        context["month_goals"] = month_goals
         context["year_month"] = year_month
         goal_all = Goal.objects.all()
         context["goal_all"] = goal_all

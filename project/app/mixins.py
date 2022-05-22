@@ -385,3 +385,14 @@ class MonthWithScheduleMixin(MonthCalendarMixin):
             year_month.append(date)
         return year_month
 
+    def get_month_goals(self, start, end, month):
+        """それぞれの日とスケジュールを返す"""
+        lookup = {
+            # '例えば、date__range: (1日, 31日)'を動的に作る
+            '{}__range'.format(self.date_field): (start, end)
+        }
+        mmonth = {self.date_field:month}
+        #date_field調べる
+        queryset = self.model.objects.filter(**mmonth)
+        month_goals = {month:queryset}
+        return month_goals

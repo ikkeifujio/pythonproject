@@ -1,5 +1,8 @@
 {% extends "blog/base.html" %}
 {% block content %}
+{% for month in year_month %}
+    <a href="{% url 'goal_form' month.year month.month month.day %}">目標</a>
+{% endfor %}
 <body>
     {% if user.is_authenticated %}
     <p>{{ user.get_username }}でログイン中</p>
@@ -47,6 +50,5 @@
 {% endfor %}
 <a href="{% url  'bulletinboard' %}">掲示板の投稿はこちら！</a>
 <hr>
-    {% include  'blog/goal.html' %}
 </body>
 {% endblock %}
