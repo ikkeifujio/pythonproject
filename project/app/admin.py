@@ -1,9 +1,10 @@
 from django.contrib import admin
 
 from django.contrib import admin
-from .models import Post, Comment, Account, Schedule, Goal
+from .models import Post, Comment, Account, Schedule, Goal, IndividualSchedule
 admin.site.register(Post)
 admin.site.register(Comment)
 admin.site.register(Account)
 admin.site.register(Schedule)
 admin.site.register(Goal)
+admin.site.register(IndividualSchedule)

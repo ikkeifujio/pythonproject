@@ -18,6 +18,9 @@
         <a href="{% url 'register' %}">新規登録</a>
         {% endif %}
         <a href="{% url 'month_with_schedule' %}">スケジュールカレンダー</a>
+        {% for month in year_month_day %}
+        <a href="{% url 'goal_form' month.year month.month month.day %}">目標</a>
+        {% endfor %}
         <section class="section">
             <div class="container">
                 {% block content %}

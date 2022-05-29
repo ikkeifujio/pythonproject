@@ -1,8 +1,5 @@
 {% extends "blog/base.html" %}
 {% block content %}
-{% for month in year_month %}
-    <a href="{% url 'goal_form' month.year month.month month.day %}">目標</a>
-{% endfor %}
 <body>
     {% if user.is_authenticated %}
     <p>{{ user.get_username }}でログイン中</p>
@@ -50,5 +47,31 @@
 {% endfor %}
 <a href="{% url  'bulletinboard' %}">掲示板の投稿はこちら！</a>
 <hr>
+<h1>今年の目標</h1>
+{% if goal_first.year%}
+    <p>{{goal_first.year}}</p>
+{% else %}
+    <p>目標を決めてください</p>
+{% endif %}
+<div>
+    <h1>今月の目標</h1>
+        {% for months, goals in now_month_goal.items %}
+            {% if goals %}
+                <tr>
+                    {% for goal in goals %}
+                        <p>{{goal.month}}</p>
+                    {% endfor %}
+                </tr>
+            {% else %}
+            <tr>
+                <p>目標を決めてください</p>
+                {% for month in year_month_day %}
+                <a href="{% url 'goal_form' month.year month.month month.day %}">目標決定はこちらから！</a>
+                {% endfor %}
+            </tr>
+            {% endif %}
+        {% endfor %}
+</div>
+
 </body>
 {% endblock %}

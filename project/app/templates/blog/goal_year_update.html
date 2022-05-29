@@ -1,0 +1,14 @@
+{% extends "blog/base.html" %}
+{% block content %}
+<body>
+    <h1>目標変更</h1>
+    <form action="" method="POST">
+        <input type="hidden" name="month" value="{{goal_first.month}}">
+        <p>今年の目標：{{form.year}}</p>
+        <button type="submit" class="btn btn-primary">送信</button>
+        {% csrf_token %}
+        </form>
+    <hr>
+        <a href="{{request.META.HTTP_REFERER}}">戻る</a>
+</body>
+{% endblock %}

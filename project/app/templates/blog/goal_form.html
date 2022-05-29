@@ -1,27 +1,41 @@
 {% extends "blog/base.html" %}
 {% block content %}
 {% for month in year_month %}
-    <a href="{% url 'goal_form' month.year month.month month.day %}">{{month.month}}</a>
+    <a href="{% url 'goal_form' month.year month.month month.day %}">{{month.month}}月</a>
 {% endfor %}
 <h1>今年の目標</h1>
-    {% for goal in goal_all %}
-    <p>{{goal.year}}</p>
+    <p>{{goal_first.year}}</p>
+    {% for months, goals in month_goals.items %}
+        {% for goal in goals %} 
+        <a href="{% url 'goal_year_update' goal_first.pk months.year months.month months.day %}">編集</a>
+        {% endfor %}
     {% endfor %}
+    <hr>
 <h1>{{ month_current.month }}月の目標</h1>
         {% for months, goals in month_goals.items %}
             {% for goal in goals %}
             <p>{{goal.month}}</p>
-            <a href="{% url 'goal_update' goal.pk %}">編集</a> <!-- 追加 -->
+            <a href="{% url 'goal_month_update' goal.pk months.year months.month months.day %}">編集</a> <!-- 追加 -->
             {% endfor %}
         {% endfor %}
     <hr>
-    {% if day_schedules  %}
+    {% if goal_month %}
+
     {% else %}
-        <form action="" method="POST">
-            <p>今年の目標：{{goal_form.year}}</p>
+        {% if goal_first %}
+            <form action="" method="POST">
+            <input type="hidden" name="year" value="{{goal_first.year}}">
             <p>今月の目標：{{goal_form.month}}</p>
             <button type="submit" class="btn btn-primary">送信</button>
             {% csrf_token %}
-        </form>
+            </form>
+        {% else %}
+            <form action="" method="POST">
+                <p>今年の目標：{{goal_form.year}}</p>
+                <p>今月の目標：{{goal_form.month}}</p>
+                <button type="submit" class="btn btn-primary">送信</button>
+                {% csrf_token %}
+            </form>
+        {% endif %}
     {% endif %}
 {% endblock %}

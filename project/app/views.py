@@ -2,15 +2,16 @@ from calendar import month
 from curses import A_ALTCHARSET
 from re import A
 from tkinter import S
+from unittest import skip
 from appscript import k
 from django.shortcuts import render, redirect
 #テンプレートタグ(調べる)
 from django.views.generic import TemplateView
 from sympy import Id
 from app.forms import ComentForm, PostForm, SimpleScheduleForm
-from .models import Goal, Post
+from .models import Goal, Post, IndividualSchedule
 #ユーザーアカウントフォーム
-from .forms import AccountForm, AddAccountForm, GoalForm
+from .forms import AccountForm, AddAccountForm, GoalForm, IndividualScheduleForm
 
 #ログイン、ログアウト時に必要
 from django.contrib.auth import authenticate, login, logout
@@ -98,11 +99,21 @@ class frontpages(mixins.WeekWithScheduleMixin,generic.CreateView):
         context["posts"] = posts
         goal_all = Goal.objects.all()
         context["goal_all"] = goal_all
+        for i in range(0, len(goal_all)):
+            goal_first = goal_all[i]
+            if 1 != goal_first:
+                break
+            else:
+                context["goal_first"] = goal_first
         year_month = []
         date = datetime.date.today()
         date = date.replace(year=date.year, month=date.month, day=1)
         year_month.append(date)
         context["year_month"] = year_month
+        nowdate = datetime.date.today()
+        nowdate = nowdate.replace(year=nowdate.year, month=nowdate.month, day=1)
+        now_month_goal = self.get_month_goal(nowdate)
+        context["now_month_goal"] = now_month_goal
         print(context)
         return context
 
@@ -185,7 +196,6 @@ class  AccountRegistration(TemplateView):
 
 
 
-
 class MonthCalendar(mixins.MonthCalendarMixin, generic.TemplateView):
     """月間カレンダーを表示するビュー"""
     template_name = 'blog/month.html'
@@ -228,28 +238,6 @@ class MyCalendar(mixins.MonthCalendarMixin, mixins.WeekWithScheduleMixin, generi
         return redirect('mycalendar', year=date.year, month=date.month, day=date.day)
 
 
-class MonthWithFormsCalendar(mixins.MonthWithFormsMixin, generic.View):
-    """フォーム付きの月間カレンダーを表示するビュー"""
-    template_name = 'blog/month_with_forms.html'
-    model = Schedule
-    date_field = 'date'
-    form_class = SimpleScheduleForm
-
-    def get(self, request, **kwargs):
-        context = self.get_month_calendar()
-        return render(request, self.template_name, context)
-
-
-    def post(self, request, **kwargs):
-        context = self.get_month_calendar()
-        formset = context['month_formset']
-        if formset.is_valid():
-            formset.save()
-            return redirect('month_with_forms')
-
-        return render(request, self.template_name, context)
-
-
 
 class MonthWithScheduleCalendar(mixins.MonthWithScheduleMixin, generic.CreateView):
     """スケジュール付きの月間カレンダーを表示するビュー"""
@@ -262,6 +250,9 @@ class MonthWithScheduleCalendar(mixins.MonthWithScheduleMixin, generic.CreateVie
         context = super().get_context_data(**kwargs)
         calendar_context = self.get_month_calendar()
         context.update(calendar_context)
+        individual = IndividualSchedule.objects.all()
+        for user in individual:
+            print(user)
         print(context)
         return context
     
@@ -301,10 +292,29 @@ class GoalData(mixins.MonthWithScheduleMixin, generic.CreateView):
         year_month_last = year_month[-1]
         month_goals = self.get_month_goals(year_month_first,year_month_last,date)
         context["month_goals"] = month_goals
+        for months, goals in month_goals.items():
+            for goal in goals:
+                goal_month = goal.month
+                context["months"] = months
+                context["goal_month"] = goal_month
+        nowdate = datetime.date.today()
+        nowdate = nowdate.replace(year=nowdate.year, month=nowdate.month, day=1)
+        now_month_goal = self.get_month_goal(nowdate)
+        context["now_month_goal"] = now_month_goal
         context["year_month"] = year_month
         goal_all = Goal.objects.all()
         context["goal_all"] = goal_all
+        for goal in goal_all:
+            context["goal"] = goal
+        for i in range(0, len(goal_all)):
+            goal_first = goal_all[i]
+            if 1 != goal_first:
+                break
+            else:
+                context["goal_first"] = goal_first
         goal_form = GoalForm()
+        goal_post = GoalForm(self.request.POST)
+        context["goal_post"] = goal_post
         context["date"] = date
         context["goal_form"] = goal_form
         print(context)
@@ -325,15 +335,64 @@ class GoalData(mixins.MonthWithScheduleMixin, generic.CreateView):
         return redirect('goal_form', year=date.year, month=date.month, day=date.day)
 
 
-class GoalDataUpdate(generic.UpdateView):
-    template_name = "blog/goal_update.html"
+class GoalMonthUpdate(generic.UpdateView):
+    template_name = "blog/goal_month_update.html"
     model = Goal
-    fields = ('year', 'month')
+    form_class = GoalForm
 
     def get_success_url(self):
-        return reverse('goal_form')
+        month = self.kwargs.get('month')
+        year = self.kwargs.get('year')
+        day = self.kwargs.get('day')
+        if month and year and day:
+            date = datetime.date(year=int(year), month=int(month), day=int(day))
+        else:
+            date = datetime.date.today()
+        return reverse('goal_form', kwargs=dict(year=date.year, month=date.month, day=1))
 
+
+class GoalYearUpdate(generic.UpdateView):
+    template_name = "blog/goal_year_update.html"
+    model = Goal
+    form_class = GoalForm
+
+    def get_success_url(self):
+        month = self.kwargs.get('month')
+        year = self.kwargs.get('year')
+        day = self.kwargs.get('day')
+        if month and year and day:
+            date = datetime.date(year=int(year), month=int(month), day=int(day))
+        else:
+            date = datetime.date.today()
+        return reverse('goal_form', kwargs=dict(year=date.year, month=date.month, day=1))
+
+
+
+class IndividualFormCalendar(mixins.IndividualWithScheduleMixin,generic.CreateView):
+    template_name = "blog/individual_calendar.html"
+    model = IndividualSchedule
+    form_class = IndividualScheduleForm
+    date_field = "date"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        calendar_context = self.get_month_calendar()
+        context.update(calendar_context)
+        individual_all = IndividualSchedule.objects.all()
+        context["individual_all"] = individual_all
+        print(context)
+        return context
+    
     def form_valid(self, form):
-        goal_form = form.save(commit=False)
-        goal_form.save()
-        return super().form_valid(form)
+        month = self.kwargs.get('month')
+        year = self.kwargs.get('year')
+        day = self.kwargs.get('day')
+        if month and year and day:
+            date = datetime.date(year=int(year), month=int(month), day=int(day))
+        else:
+            date = datetime.date.today()
+        schedule = form.save(commit=False)
+        schedule.user = self.request.user
+        schedule.date = date
+        schedule.save()
+        return redirect('individual_calendar', year=date.year, month=date.month, day=date.day)

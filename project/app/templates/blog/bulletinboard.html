@@ -1,11 +1,6 @@
 {% extends "blog/base.html" %}
 {% block content %}
 <body>
-    {% if user.is_authenticated %}
-    <p>{{ user.get_username }}でログイン中</p>
-    {% else %}
-    <p>ログインしていません</p>
-    {% endif %}
 {% for post in posts %}
 <div class="post block">
     <h2 class="subtitle">{{post.title}}</h2>
@@ -16,7 +11,8 @@
     <hr />
 </div>
 {% endfor %}
-<h2 class="subtitle">投稿を追加</h2>
+    {% if user.is_authenticated %}
+    <h2 class="subtitle">投稿を追加</h2>
     <form action="." method="post">
         {% csrf_token %}
         {{post_forms.as_p}}
@@ -26,5 +22,11 @@
             </div>
         </div>
     </form>
+    {% else %}
+    <div>
+        <p>投稿するにはログインしてください</p>
+        <a href="{% url 'login' %}" class="btn">ログイン</a>
+    </div>
+    {% endif %}
 </body>
 {% endblock %}

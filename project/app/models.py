@@ -59,3 +59,16 @@ class Goal(models.Model):
     year = models.CharField("今年の目標",max_length=100)
     month = models.CharField("今月の目標",max_length=100)
     date = models.DateField("日付")
+
+class IndividualSchedule(models.Model):
+    """スケジュール"""
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    summary = models.CharField('概要', max_length=50)
+    description = models.TextField('詳細な説明', blank=True)
+    start_time = models.TimeField('開始時間', default=datetime.time(7, 0, 0))
+    end_time = models.TimeField('終了時間', default=datetime.time(7, 0, 0))
+    date = models.DateField('日付')
+    created_at = models.DateTimeField('作成日', default=timezone.now)
+
+    def __str__(self):
+        return str(self.user)
