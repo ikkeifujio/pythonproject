@@ -4,10 +4,8 @@
     {{ month_current | date:"Y年m月" }}
     <a href="{% url 'individual_calendar' month_next.year month_next.month month_next.day %}">次月</a>
         <table class="table">
+        {% if user.is_authenticated %}
             <p>{{ user.get_username }}さん、{{ month_current | date:"Y年m月" }}のスケジュールを記入してください！</p>
-            {% for user in individual_all %}
-                {{user}}
-            {% endfor %}
             <thead>
             <tr>
                 {% for w in week_names %}
@@ -61,5 +59,11 @@
                     <button type="submit" class="btn btn-primary">送信</button>
                 </form>
             </div>
+        {% else %}
+        <div>
+            <p>投稿するにはログインしてください</p>
+            <a href="{% url 'login' %}" class="btn">ログイン</a>
+        </div>
+        {% endif %}
         </table>
 {% endblock %}

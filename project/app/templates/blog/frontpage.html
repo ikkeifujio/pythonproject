@@ -35,7 +35,7 @@
 <hr>
 <h1>掲示板</h1>
 <hr>
-{% for post in posts %}
+{% for post in posts|slice:"5" %}
 <div class="post block">
     <h2 class="subtitle">{{post.title}}</h2>
     <small>投稿された時間：{{post.posted_date}}</small>
@@ -72,6 +72,12 @@
             {% endif %}
         {% endfor %}
 </div>
-
+<hr>
+<div>
+    <h1>当番</h1>
+    {% for role in role_all|slice:"5" %}
+        <p>{{role.role}}：{{role.user}}</p>
+    {% endfor %}
+</div>
 </body>
 {% endblock %}

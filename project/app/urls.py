@@ -1,5 +1,5 @@
 from django.urls import path
-from app.views import IndividualFormCalendar,GoalData, GoalMonthUpdate, GoalYearUpdate, Login, Logout, AccountRegistration, bulletinboard, home, post_detail, MonthCalendar, MyCalendar, MonthWithScheduleCalendar
+from app.views import RoleData,IndividuaWithSchedule,IndividualFormCalendar,GoalData, GoalMonthUpdate, GoalYearUpdate, Login, Logout, AccountRegistration, bulletinboard, home, post_detail, MonthCalendar, MyCalendar, MonthWithScheduleCalendar
 GoalData,GoalMonthUpdate, GoalYearUpdate, 
 urlpatterns = [
     path('register/', AccountRegistration.as_view(), name='register'),
@@ -22,4 +22,7 @@ urlpatterns = [
     path("goal_year_update/<int:pk>/<int:year>/<int:month>/<int:day>/", GoalYearUpdate.as_view(), name="goal_year_update"),
     path('individual_calendar/', IndividualFormCalendar.as_view(), name='individual_calendar'),
     path('individual_calendar/<int:year>/<int:month>/<int:day>/', IndividualFormCalendar.as_view(), name='individual_calendar'),
+    path('individual_schedule/<int:pk>/', IndividuaWithSchedule.as_view(), name="individual_schedule"),
+    path('individual_schedule/<int:pk>/<int:year>/<int:month>/<int:day>/', IndividuaWithSchedule.as_view(), name='individual_schedule'),
+    path('role/', RoleData.as_view(), name='role'),
 ]

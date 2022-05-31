@@ -1,6 +1,6 @@
 from attr import field
 from django import forms
-from .models import Comment, Post, Account, Schedule, Goal, IndividualSchedule
+from .models import Comment, Post, Account, Schedule, Goal, IndividualSchedule, Role
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 
@@ -126,3 +126,9 @@ class IndividualScheduleForm(forms.ModelForm):
                 '終了時間は、開始時間よりも後にしてください'
             )
         return end_time
+
+
+class RoleForm(forms.ModelForm):
+    class Meta:
+        model = Role
+        fields = ["role"]

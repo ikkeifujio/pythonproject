@@ -61,7 +61,6 @@ class Goal(models.Model):
     date = models.DateField("日付")
 
 class IndividualSchedule(models.Model):
-    """スケジュール"""
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     summary = models.CharField('概要', max_length=50)
     description = models.TextField('詳細な説明', blank=True)
@@ -72,3 +71,8 @@ class IndividualSchedule(models.Model):
 
     def __str__(self):
         return str(self.user)
+
+
+class Role(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    role = models.CharField("やること", max_length=50)

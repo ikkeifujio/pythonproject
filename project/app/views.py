@@ -9,9 +9,9 @@ from django.shortcuts import render, redirect
 from django.views.generic import TemplateView
 from sympy import Id
 from app.forms import ComentForm, PostForm, SimpleScheduleForm
-from .models import Goal, Post, IndividualSchedule
+from .models import Account, Goal, Post, IndividualSchedule, Role
 #ユーザーアカウントフォーム
-from .forms import AccountForm, AddAccountForm, GoalForm, IndividualScheduleForm
+from .forms import AccountForm, AddAccountForm, GoalForm, IndividualScheduleForm, RoleForm
 
 #ログイン、ログアウト時に必要
 from django.contrib.auth import authenticate, login, logout
@@ -114,6 +114,8 @@ class frontpages(mixins.WeekWithScheduleMixin,generic.CreateView):
         nowdate = nowdate.replace(year=nowdate.year, month=nowdate.month, day=1)
         now_month_goal = self.get_month_goal(nowdate)
         context["now_month_goal"] = now_month_goal
+        role_all = Role.objects.all()
+        context["role_all"] = role_all
         print(context)
         return context
 
@@ -250,9 +252,8 @@ class MonthWithScheduleCalendar(mixins.MonthWithScheduleMixin, generic.CreateVie
         context = super().get_context_data(**kwargs)
         calendar_context = self.get_month_calendar()
         context.update(calendar_context)
-        individual = IndividualSchedule.objects.all()
-        for user in individual:
-            print(user)
+        account = Account.objects.all()
+        context["account"] = account
         print(context)
         return context
     
@@ -396,3 +397,58 @@ class IndividualFormCalendar(mixins.IndividualWithScheduleMixin,generic.CreateVi
         schedule.date = date
         schedule.save()
         return redirect('individual_calendar', year=date.year, month=date.month, day=date.day)
+
+
+
+class IndividuaWithSchedule(mixins.IndividualWithScheduleMixin,generic.CreateView):
+    template_name = "blog/individual_schedule.html"
+    model = IndividualSchedule
+    form_class = IndividualScheduleForm
+    date_field = "date"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        calendar_context = self.get_month_calendar()
+        context.update(calendar_context)
+        account = Account.objects.all()
+        context["account"] = account
+        name_pk = self.kwargs.get('pk')
+        context["name_pk"] = name_pk
+        page_name = Account.objects.get(pk=name_pk)
+        context["page_name"] = page_name
+        print(context)
+        return context
+    
+    def form_valid(self, form):
+        month = self.kwargs.get('month')
+        year = self.kwargs.get('year')
+        day = self.kwargs.get('day')
+        if month and year and day:
+            date = datetime.date(year=int(year), month=int(month), day=int(day))
+        else:
+            date = datetime.date.today()
+        schedule = form.save(commit=False)
+        schedule.user = self.request.user
+        schedule.date = date
+        schedule.save()
+        return redirect('individual_calendar', year=date.year, month=date.month, day=date.day)
+
+class RoleData(generic.CreateView):
+    template_name = 'blog/role.html'
+    model = Role
+    form_class = RoleForm
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        role_post = Role.objects.all()
+        user = self.request.user
+        context['user'] = user
+        context["role_post"] = role_post
+        return context
+    
+    def form_valid(self, form):
+
+        role = form.save(commit=False)
+        role.user = self.request.user
+        role.save()
+        return redirect('role')

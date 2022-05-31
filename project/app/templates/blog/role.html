@@ -1,0 +1,21 @@
+{% extends 'blog/base.html' %}
+{% block content %}
+<p>{{ user.get_username }}でログイン中</p>
+<h1>当番</h1>
+{% for role in role_post %}
+    <p>{{role.role}}：{{role.user}}</p>
+{% endfor %}
+<hr>
+{% if user.is_authenticated %}
+        <form action="" method="POST">
+            <p>{{form.as_p}}</p>
+            <button type="submit" class="btn btn-primary">送信</button>
+            {% csrf_token %}
+        </form>
+{% else %}
+    <div>
+        <p>投稿するにはログインしてください</p>
+        <a href="{% url 'login' %}" class="btn">ログイン</a>
+    </div>
+{% endif %}
+{% endblock %}

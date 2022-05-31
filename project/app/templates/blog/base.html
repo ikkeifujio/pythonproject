@@ -21,6 +21,7 @@
         {% for month in year_month_day %}
         <a href="{% url 'goal_form' month.year month.month month.day %}">目標</a>
         {% endfor %}
+        <a href="{% url 'role' %}">当番</a>
         <section class="section">
             <div class="container">
                 {% block content %}
