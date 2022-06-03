@@ -1,6 +1,9 @@
 {% extends 'blog/base.html' %}
 {% block content %}
-<p>{{ user.get_username }}でログイン中</p>
+{% if user.is_authenticated %}
+    <p>{{ user.get_username }}でログイン中</p>
+    {% else %}
+{% endif %}
 <h1>当番</h1>
 {% for role in role_post %}
     <p>{{role.role}}：{{role.user}}</p>

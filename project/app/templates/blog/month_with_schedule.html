@@ -45,24 +45,44 @@
                     {% endfor %}
                 </tr>
             {% endfor %}
-            </tbody>
-            <div>
-                <p>{{ day_current | date:"Y年m月d日" }}の予定を書く</p>
-                <form action="" method="POST">
-                    {{ form.non_field_errors }}
-                    {% for field in form %}
-                        <div class="form-group row">
-                            <label for="{{ field.id_for_label }}"
-                                class="col-sm-4 col-form-label">{{ field.label_tag }}</label>
-                            <div class="col-sm-8">
-                                {{ field }}
-                                {{ field.errors }}
+                <div>
+                    <p>{{ day_current | date:"Y年m月d日" }}の予定を書く</p>
+                    <form action="" method="POST">
+                        {{ form.non_field_errors }}
+                        {% for field in form %}
+                            <div class="form-group row">
+                                <label for="{{ field.id_for_label }}"
+                                    class="col-sm-4 col-form-label">{{ field.label_tag }}</label>
+                                <div class="col-sm-8">
+                                    {{ field }}
+                                    {{ field.errors }}
+                                </div>
                             </div>
+                        {% endfor %}
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary">送信</button>
+                    </form>
+                </div>
+                <hr>
+                <div>
+                    <h1>月間スケジュール</h1>
+                        {% for fourschedules in monthschedules %}
+                        <div>
+                            {% for month, schedules in fourschedules.items %}
+                                <a href="{% url 'month_with_schedule' month.year month.month month.day %}">{{month.month}}</a>
+                                {% for schedule in schedules %}
+                                    {{schedule.goal}}
+                                {% endfor %}
+                            {% endfor %}
                         </div>
-                    {% endfor %}
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-primary">送信</button>
-                </form>
-            </div>
+                        {% endfor %}
+                        <div>
+                        {% for month in year_month_day %}
+                        <a href="{% url 'month_schedule' month.year month.month month.day %}">月のスケジュール投稿はこちら！</a>
+                        {% endfor %}
+                        </div>
+                        <hr>
+                </div>
+            </tbody>
         </table>
 {% endblock %}

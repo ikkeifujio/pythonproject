@@ -1,6 +1,6 @@
 from attr import field
 from django import forms
-from .models import Comment, Post, Account, Schedule, Goal, IndividualSchedule, Role
+from .models import Comment, Post, Account, Schedule, Goal, IndividualSchedule, Role, MonthGoal
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 
@@ -132,3 +132,8 @@ class RoleForm(forms.ModelForm):
     class Meta:
         model = Role
         fields = ["role"]
+
+class MonthForm(forms.ModelForm):
+    class Meta:
+        model = MonthGoal
+        fields = ["goal"]

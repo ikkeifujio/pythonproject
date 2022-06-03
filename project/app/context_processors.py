@@ -8,6 +8,8 @@ def some_processor(request: HttpRequest):
     date = date.replace(year=date.year, month=date.month, day=1)
     year_month.append(date)
     context = {}
+    now = datetime.datetime.now()
+    context["now"] = now
     context["year_month_day"] = year_month
     goal_all = Goal.objects.all()
     for i in range(0, len(goal_all)):

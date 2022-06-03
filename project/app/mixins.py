@@ -6,7 +6,7 @@ from django import forms
 from sympy import Q
 import itertools
 
-from app.models import Goal
+from app.models import Goal, MonthGoal
 
 class BaseCalendarMixin:
     """カレンダー関連Mixinの、基底クラス"""
@@ -396,12 +396,8 @@ class MonthWithScheduleMixin(MonthCalendarMixin):
             year_month.append(date)
         return year_month
 
-    def get_month_goals(self, start, end, month):
+    def get_month_goals(self, month):
         """それぞれの日とスケジュールを返す"""
-        lookup = {
-            # '例えば、date__range: (1日, 31日)'を動的に作る
-            '{}__range'.format(self.date_field): (start, end)
-        }
         mmonth = {self.date_field:month}
         #date_field調べる
         queryset = self.model.objects.filter(**mmonth)
@@ -460,3 +456,41 @@ class IndividualWithScheduleMixin(MonthCalendarMixin):
         return year_month
 
     
+
+class MonthScheduleMixin(MonthCalendarMixin):
+
+    def get_monthschedules(self, start, end, months):
+        """それぞれの日とスケジュールを返す"""
+        lookup = {
+            # '例えば、date__range: (1日, 31日)'を動的に作る
+            '{}__range'.format("date"): (start, end)
+        }
+        # 例えば、Schedule.objects.filter(date__range=(1日, 31日)) になる
+
+        queryset = MonthGoal.objects.filter(**lookup)
+
+        # {1日のdatetime: 1日のスケジュール全て, 2日のdatetime: 2日の全て...}のような辞書を作る
+        day_schedules = {month: [] for month in months}
+        for schedule in queryset:
+            schedule_date = getattr(schedule, "date")
+            day_schedules[schedule_date].append(schedule)
+
+        # day_schedules辞書を、周毎に分割する。[{1日: 1日のスケジュール...}, {8日: 8日のスケジュール...}, ...]
+        # 7個ずつ取り出して分割しています。
+        size = len(day_schedules)
+        return [{key: day_schedules[key] for key in itertools.islice(day_schedules, i, i+4)} for i in range(0, size, 4)]
+
+    def get_year_month(self, date):
+        year_month = []
+        for i in range(12):
+            date = date.replace(year=date.year, month=1+i, day=1)
+            year_month.append(date)
+        return year_month
+
+    def get_monthschedule(self, month):
+        """それぞれの日とスケジュールを返す"""
+        mmonth = {"date":month}
+        #date_field調べる
+        queryset = self.model.objects.filter(**mmonth)
+        month_schedule = {month:queryset}
+        return month_schedule

@@ -74,10 +74,15 @@
 </div>
 <hr>
 <div>
-    <h1>当番</h1>
-    {% for role in role_all|slice:"5" %}
-        <p>{{role.role}}：{{role.user}}</p>
-    {% endfor %}
+    {% if rore_all %}
+        <h1>当番</h1>
+        {% for role in role_all|slice:"5" %}
+            <p>{{role.role}}：{{role.user}}</p>
+        {% endfor %}
+    {% else %}
+        <h1>特に当番は決まっていません</h1>
+        <a href="{% url 'role' %}">当番決めはこちらから！</a>
+    {% endif %}
 </div>
 </body>
 {% endblock %}

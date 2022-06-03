@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 from django.contrib import admin
-from .models import Post, Comment, Account, Schedule, Goal, IndividualSchedule, Role
+from .models import Post, Comment, Account, Schedule, Goal, IndividualSchedule, Role, MonthGoal
 admin.site.register(Post)
 admin.site.register(Comment)
 admin.site.register(Account)
@@ -9,3 +9,4 @@ admin.site.register(Schedule)
 admin.site.register(Goal)
 admin.site.register(IndividualSchedule)
 admin.site.register(Role)
+admin.site.register(MonthGoal)

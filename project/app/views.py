@@ -1,6 +1,7 @@
 from calendar import month
 from curses import A_ALTCHARSET
 from re import A
+from this import s
 from tkinter import S
 from unittest import skip
 from appscript import k
@@ -9,9 +10,9 @@ from django.shortcuts import render, redirect
 from django.views.generic import TemplateView
 from sympy import Id
 from app.forms import ComentForm, PostForm, SimpleScheduleForm
-from .models import Account, Goal, Post, IndividualSchedule, Role
+from .models import Account, Goal, Post, IndividualSchedule, Role, MonthGoal
 #ユーザーアカウントフォーム
-from .forms import AccountForm, AddAccountForm, GoalForm, IndividualScheduleForm, RoleForm
+from .forms import AccountForm, AddAccountForm, GoalForm, IndividualScheduleForm, RoleForm, MonthForm
 
 #ログイン、ログアウト時に必要
 from django.contrib.auth import authenticate, login, logout
@@ -241,7 +242,7 @@ class MyCalendar(mixins.MonthCalendarMixin, mixins.WeekWithScheduleMixin, generi
 
 
 
-class MonthWithScheduleCalendar(mixins.MonthWithScheduleMixin, generic.CreateView):
+class MonthWithScheduleCalendar(mixins.MonthScheduleMixin, mixins.MonthWithScheduleMixin, generic.CreateView):
     """スケジュール付きの月間カレンダーを表示するビュー"""
     template_name = 'blog/month_with_schedule.html'
     model = Schedule
@@ -254,6 +255,21 @@ class MonthWithScheduleCalendar(mixins.MonthWithScheduleMixin, generic.CreateVie
         context.update(calendar_context)
         account = Account.objects.all()
         context["account"] = account
+        month = self.kwargs.get('month')
+        year = self.kwargs.get('year')
+        day = self.kwargs.get('day')
+        if month and year and day:
+            date = datetime.date(year=int(year), month=int(month), day=int(day))
+        else:
+            date = datetime.date.today()
+        year_month = self.get_year_month(date) 
+        year_first = year_month[0]
+        year_last = year_month[-1]
+        context["year_month"] = year_month
+        monthschedule = self.get_monthschedule(date)
+        context["monthschedule"] = monthschedule
+        monthschedules = self.get_monthschedules(year_first,year_last,year_month)
+        context["monthschedules"] = monthschedules
         print(context)
         return context
     
@@ -289,9 +305,7 @@ class GoalData(mixins.MonthWithScheduleMixin, generic.CreateView):
         else:
             date = datetime.date.today()
         year_month = self.get_year_month(date)
-        year_month_first = year_month[1]
-        year_month_last = year_month[-1]
-        month_goals = self.get_month_goals(year_month_first,year_month_last,date)
+        month_goals = self.get_month_goal(date)
         context["month_goals"] = month_goals
         for months, goals in month_goals.items():
             for goal in goals:
@@ -452,3 +466,51 @@ class RoleData(generic.CreateView):
         role.user = self.request.user
         role.save()
         return redirect('role')
+
+
+
+class MonthScedule(mixins.MonthScheduleMixin, generic.CreateView):
+
+    template_name = "blog/month_schedule.html"
+    model = MonthGoal
+    form_class = MonthForm
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        monthscheduleform = MonthForm()
+        monthschedulepost = MonthGoal.objects.all()
+        context["monthscheduleform"] = monthscheduleform
+        context["monthschedulepost"] = monthschedulepost
+        month = self.kwargs.get('month')
+        year = self.kwargs.get('year')
+        day = self.kwargs.get('day')
+        if month and year and day:
+            date = datetime.date(year=int(year), month=int(month), day=int(day))
+        else:
+            date = datetime.date.today()
+        year_month = self.get_year_month(date) 
+        context["date"] = date
+        year_first = year_month[0]
+        year_last = year_month[-1]
+        context["year_month"] = year_month
+        monthschedule = self.get_monthschedule(date)
+        context["monthschedule"] = monthschedule
+        monthschedules = self.get_monthschedules(year_first,year_last,year_month)
+        context["monthschedules"] = monthschedules
+        for months, schedule in monthschedule.items():
+            context["schedule"] = schedule
+        print(context)
+        return context
+
+    def form_valid(self, form):
+        month = self.kwargs.get('month')
+        year = self.kwargs.get('year')
+        day = self.kwargs.get('day')
+        if month and year and day:
+            date = datetime.date(year=int(year), month=int(month), day=int(day))
+        else:
+            date = datetime.date.today()
+        monthform = form.save(commit=False)
+        monthform.date = date
+        monthform.save()
+        return redirect('month_schedule', year=date.year, month=date.month, day=date.day)

@@ -76,3 +76,8 @@ class IndividualSchedule(models.Model):
 class Role(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     role = models.CharField("やること", max_length=50)
+
+
+class MonthGoal(models.Model):
+    goal = models.CharField('スケジュール', max_length=50)
+    date = models.DateField()

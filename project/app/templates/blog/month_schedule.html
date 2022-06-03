@@ -1,0 +1,26 @@
+{% extends 'blog/base.html' %}
+{% block content %}
+<div>
+    <p>{{date.month}}月のスケジュールを投稿する</p>
+        {% for fourschedules in monthschedules %}
+                <div>
+                {% for month, schedules in fourschedules.items %}
+                    <a href="{% url 'month_schedule' month.year month.month month.day %}">{{month.month}}</a>
+                    {% for schedule in schedules %}
+                        {{schedule.goal}}
+                    {% endfor %}
+                {% endfor %}
+                </div>
+        {% endfor %}
+    {% if schedule %}
+    {% else %}
+        {% for scheduleform in monthscheduleform %}
+            <form action="" method="POST">
+                <p>目標：{{scheduleform}}</p>
+                <button type="submit" class="btn btn-primary">送信</button>
+                {% csrf_token %}
+            </form>
+        {% endfor %}
+    {% endif %}
+</div>
+{% endblock %}
