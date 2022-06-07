@@ -1,16 +1,15 @@
 from django.urls import path
-from app.views import MonthScedule,RoleData,IndividuaWithSchedule,IndividualFormCalendar,GoalData, GoalMonthUpdate, GoalYearUpdate, Login, Logout, AccountRegistration, bulletinboard, home, post_detail, MonthCalendar, MyCalendar, MonthWithScheduleCalendar
+from app.views import LoginPage,MonthScedule,RoleData,IndividuaWithSchedule,IndividualFormCalendar,GoalData, GoalMonthUpdate, GoalYearUpdate, Login, Logout, AccountRegistration, bulletinboard, home, post_detail, MonthCalendar, MyCalendar, MonthWithScheduleCalendar
 GoalData,GoalMonthUpdate, GoalYearUpdate, 
 urlpatterns = [
     path('register/', AccountRegistration.as_view(), name='register'),
     path('login/', Login, name='login'),
+    path('loginpage/', LoginPage, name='loginpage'),
     path("logout/", Logout, name="logout"),
     path("home/", home, name="home"),
     path("post_detail/<slug:slug>/", post_detail, name='post_detail'),
     path('mycalendar/', MyCalendar.as_view(), name='mycalendar'),
-    path(
-        'mycalendar/<int:year>/<int:month>/<int:day>/', MyCalendar.as_view(), name='mycalendar'
-    ),  
+    path('mycalendar/<int:year>/<int:month>/<int:day>/', MyCalendar.as_view(), name='mycalendar'),  
     path('bulletinboard/', bulletinboard, name="bulletinboard"),
     path('month/', MonthCalendar.as_view(), name='month'),
     path('month/<int:year>/<int:month>/<int:day>/', MonthCalendar.as_view(), name='month'),

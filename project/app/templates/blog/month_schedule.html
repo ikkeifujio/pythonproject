@@ -5,7 +5,7 @@
         {% for fourschedules in monthschedules %}
                 <div>
                 {% for month, schedules in fourschedules.items %}
-                    <a href="{% url 'month_schedule' month.year month.month month.day %}">{{month.month}}</a>
+                    <a href="{% url 'month_schedule' month.year month.month month.day %}">{{month.month}}月</a>
                     {% for schedule in schedules %}
                         {{schedule.goal}}
                     {% endfor %}

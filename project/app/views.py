@@ -26,8 +26,8 @@ from .forms import BS4ScheduleForm
 from .models import Schedule
 import datetime
 
-#ログイン
-def Login(request):
+
+def LoginPage(request):
     # POST
     if request.method == 'POST':
         # フォーム入力のユーザーID・パスワード取得
@@ -53,7 +53,40 @@ def Login(request):
             return HttpResponse("ログインIDまたはパスワードが間違っています")
     # GET
     else:
+        return render(request, 'blog/loginpage.html')
+
+
+
+
+#ログイン
+def Login(request):
+    # POST
+    if request.method == 'POST':
+        # フォーム入力のユーザーID・パスワード取得
+        ID = request.POST.get('userid')
+        Pass = request.POST.get('password')
+
+        # Djangoの認証機能
+        user = authenticate(username=ID, password=Pass)
+
+        # ユーザー認証
+        if user:
+            #ユーザーアクティベート判定
+            if user.is_active:
+                # ログイン
+                login(request,user)
+                # ホームページ遷移
+                return HttpResponseRedirect(reverse('frontpage'))
+            else:
+                # アカウント利用不可
+                return HttpResponse("アカウントが有効ではありません")
+        # ユーザー認証失敗
+        else:
+            return redirect('loginpage')
+    # GET
+    else:
         return render(request, 'blog/login.html')
+
 
 #ログアウト
 @login_required
@@ -86,7 +119,8 @@ def bulletinboard(request):
 
     return render(request, "blog/bulletinboard.html", {"posts": posts, "post_forms": post_forms, "user":user})
 
-class frontpages(mixins.WeekWithScheduleMixin,generic.CreateView):
+
+class frontpages(mixins.WeekWithScheduleMixin, generic.CreateView):
     template_name = 'blog/frontpage.html'
     model = Schedule
     date_field = 'date'

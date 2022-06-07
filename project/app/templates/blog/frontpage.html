@@ -74,7 +74,7 @@
 </div>
 <hr>
 <div>
-    {% if rore_all %}
+    {% if role_all %}
         <h1>当番</h1>
         {% for role in role_all|slice:"5" %}
             <p>{{role.role}}：{{role.user}}</p>
